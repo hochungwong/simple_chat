@@ -18,8 +18,9 @@ class _State extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
   final _fireStore = FirebaseFirestore.instance;
   void _showSnackBar(BuildContext ctx, String message) {
-    ScaffoldState scaffoldState = Scaffold.of(context);
-    scaffoldState.showSnackBar(SnackBar(
+    ScaffoldMessengerState scaffoldMessengerState =
+        ScaffoldMessenger.of(context);
+    scaffoldMessengerState.showSnackBar(SnackBar(
       content: Text(message),
       backgroundColor: Theme.of(context).errorColor,
     ));

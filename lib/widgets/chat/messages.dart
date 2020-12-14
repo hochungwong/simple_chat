@@ -6,7 +6,6 @@ import './message_bubble.dart';
 
 class Messages extends StatelessWidget {
   final currentUserId = FirebaseAuth.instance.currentUser.uid;
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
