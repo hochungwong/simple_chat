@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../pickers/user_image_picker.dart';
@@ -18,15 +19,28 @@ class _AuthFormState extends State<AuthForm> {
   String _userEmail = '';
   String _userName = '';
   String _userPwd = '';
+  File _userImageFile;
+
   void _trySubmit() {
     final _isValid = _formKey.currentState.validate();
-    if (_isValid) {
+    if (_userImageFile == null && !_isLogin) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Please pick an image'),
+        backgroundColor: Theme.of(context).errorColor,
+      ));
+      return;
+    }
+    if (_isValid && _userImageFile != null) {
       _formKey.currentState.save();
       // Close soft keyboard
       FocusScope.of(context).unfocus();
       widget.submitFn(_userEmail, _userPwd, _userName, _isLogin, context);
       // Use values to send auth req to firebase
     }
+  }
+
+  void _pickImage(File image) {
+    _userImageFile = image;
   }
 
   @override
@@ -41,7 +55,7 @@ class _AuthFormState extends State<AuthForm> {
                 key: _formKey,
                 child: Column(
                   children: <Widget>[
-                    if (!_isLogin) UserImagePicker(),
+                    if (!_isLogin) UserImagePicker(_pickImage),
                     TextFormField(
                       key: ValueKey('email'),
                       validator: (value) {
