@@ -15,15 +15,14 @@ class _UserImagePickerState extends State<UserImagePicker> {
   final picker = ImagePicker();
   void _pickImage() async {
     final pickedImage = await picker.getImage(source: ImageSource.gallery);
-    File pickedImageFile = File(pickedImage.path);
     setState(() {
       if (pickedImage != null) {
-        _pickedImage = pickedImageFile;
+        _pickedImage = File(pickedImage.path);
+        widget.imagePickFn(File(pickedImage.path));
       } else {
         print('No image selected');
       }
     });
-    widget.imagePickFn(pickedImageFile);
   }
 
   @override

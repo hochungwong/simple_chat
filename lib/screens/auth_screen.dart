@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../widgets/auth/auth_form.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,7 +16,8 @@ class _State extends State<AuthScreen> {
   static const USER_NOT_FOUND = 'user-not-found';
   static const WRONG_PASSWORD = 'wrong-password';
   static const WEAK_PASSWORD = 'weak-password';
-  static const EMAIL_ALREDAY_IN_USE = 'email-alreday-in-use';
+  static const EMAIL_ALREDAY_IN_USE = 'email-already-in-use';
+  static const INVALID_EMAIL = 'invalid_email';
   var _loading = false;
   final _auth = FirebaseAuth.instance;
   final _fireStore = FirebaseFirestore.instance;
@@ -57,13 +61,23 @@ class _State extends State<AuthScreen> {
             email: email, password: password);
       }
       _toggleLoading(false);
-    } on FirebaseAuthException catch (error) {
+    } on FirebaseAuthException catch (firebaseAuthError) {
+      switch (firebaseAuthError.code) {
+        case USER_NOT_FOUND:
+        case WRONG_PASSWORD:
+        case WEAK_PASSWORD:
+        case EMAIL_ALREDAY_IN_USE:
+        case INVALID_EMAIL:
+          _showErrorMsg(ctx, firebaseAuthError);
+          break;
+        default:
+          _showErrorMsg(ctx, firebaseAuthError);
+          break;
+      }
       _toggleLoading(false);
-      _showErrorMsg(ctx, error);
     } catch (e) {
-      print(e);
-      _toggleLoading(false);
       _showSnackBar(ctx, e.toString());
+      _toggleLoading(false);
     }
   }
 
