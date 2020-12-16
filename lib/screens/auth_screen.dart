@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../widgets/auth/auth_form.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -21,6 +21,7 @@ class _State extends State<AuthScreen> {
   var _loading = false;
   final _auth = FirebaseAuth.instance;
   final _fireStore = FirebaseFirestore.instance;
+  final _firebaseStorage = FirebaseStorage.instance;
   void _showSnackBar(BuildContext ctx, String message) {
     ScaffoldMessengerState scaffoldMessengerState =
         ScaffoldMessenger.of(context);
@@ -44,21 +45,33 @@ class _State extends State<AuthScreen> {
     });
   }
 
-  void _submitAuthForm(String email, String password, String user, bool isLogin,
-      BuildContext ctx) async {
+  void _submitAuthForm(String email, String password, String user, File image,
+      bool isLogin, BuildContext ctx) async {
+    print(isLogin);
     UserCredential userCredential;
     try {
       _toggleLoading(true);
       if (!isLogin) {
         userCredential = await _auth.createUserWithEmailAndPassword(
-            email: email, password: password);
+            email: email.trim(), password: password);
+        // perform image upload
+        final ref = _firebaseStorage
+            .ref()
+            .child('user_images')
+            .child('${userCredential.user.uid}.jpg');
+        await ref
+            .putFile(image)
+            .whenComplete(() => print('Image has been uploaded successfully'));
+        final url = await ref.getDownloadURL();
         await _fireStore.collection('users').doc(userCredential.user.uid).set({
           'username': user,
           'email': email,
+          'imageUrl': url,
         });
-      } else {
+      }
+      if (isLogin) {
         userCredential = await _auth.signInWithEmailAndPassword(
-            email: email, password: password);
+            email: email.trim(), password: password);
       }
       _toggleLoading(false);
     } on FirebaseAuthException catch (firebaseAuthError) {

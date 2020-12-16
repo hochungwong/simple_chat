@@ -7,7 +7,7 @@ class AuthForm extends StatefulWidget {
   AuthForm(this.submitFn, this.loading);
   final bool loading;
   final void Function(String email, String password, String userName,
-      bool isLogin, BuildContext ctx) submitFn;
+      File image, bool isLogin, BuildContext ctx) submitFn;
 
   @override
   _AuthFormState createState() => _AuthFormState();
@@ -34,7 +34,8 @@ class _AuthFormState extends State<AuthForm> {
       _formKey.currentState.save();
       // Close soft keyboard
       FocusScope.of(context).unfocus();
-      widget.submitFn(_userEmail, _userPwd, _userName, _isLogin, context);
+      widget.submitFn(
+          _userEmail, _userPwd, _userName, _userImageFile, _isLogin, context);
       // Use values to send auth req to firebase
     }
   }
@@ -104,8 +105,10 @@ class _AuthFormState extends State<AuthForm> {
                     if (widget.loading) CircularProgressIndicator(),
                     if (!widget.loading)
                       RaisedButton(
-                        onPressed: _trySubmit,
-                        child: Text(_isLogin ? 'Login' : 'Sign Up'),
+                        onPressed: () {
+                          _trySubmit();
+                        },
+                        child: Text(_isLogin ? 'Log In' : 'Sign Up'),
                       ),
                     FlatButton(
                       onPressed: () {
