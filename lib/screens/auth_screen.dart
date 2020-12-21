@@ -51,6 +51,10 @@ class _State extends State<AuthScreen> {
     UserCredential userCredential;
     try {
       _toggleLoading(true);
+      if (isLogin) {
+        userCredential = await _auth.signInWithEmailAndPassword(
+            email: email.trim(), password: password);
+      }
       if (!isLogin) {
         userCredential = await _auth.createUserWithEmailAndPassword(
             email: email.trim(), password: password);
@@ -68,10 +72,6 @@ class _State extends State<AuthScreen> {
           'email': email,
           'imageUrl': url,
         });
-      }
-      if (isLogin) {
-        userCredential = await _auth.signInWithEmailAndPassword(
-            email: email.trim(), password: password);
       }
       _toggleLoading(false);
     } on FirebaseAuthException catch (firebaseAuthError) {

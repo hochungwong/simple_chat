@@ -61,9 +61,11 @@ flutter {
 }
 
 def multidex_version = "2.0.1"
+def firebase_message_version = '21.0.1'
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation platform('com.google.firebase:firebase-bom:26.1.1')
-    implementation 'androidx.multidex:multidex:$multidex_version'
+    implementation "androidx.multidex:multidex:$multidex_version"
+    implementation "com.google.firebase:firebase-messaging:$firebase_message_version"
 }
